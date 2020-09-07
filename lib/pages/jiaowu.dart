@@ -112,7 +112,7 @@ class _JiaowuPageState extends State<JiaowuPage> {
                                   }));
                                   EasyLoading.dismiss();
                                 },
-                                child: Text("个人信息"),
+                                child: Text("个人信息", style: TextStyle(fontSize: 12)),
                                 color: Colors.blueAccent,
                                 textColor: Colors.white,
                               ),
@@ -129,7 +129,7 @@ class _JiaowuPageState extends State<JiaowuPage> {
                                   Global.removeJWProfile();
                                   setState(() {});
                                 },
-                                child: Text("退出登录"),
+                                child: Text("退出登录",style: TextStyle(fontSize: 12)),
                                 color: Colors.red,
                                 textColor: Colors.white,
                               )

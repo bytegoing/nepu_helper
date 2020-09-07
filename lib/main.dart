@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:nepu_helper/app.dart';
 import 'package:nepu_helper/loading.dart';
 
@@ -13,5 +14,10 @@ MaterialApp NEPUHelper() {
       "/app": (BuildContext context) => new App(),
     },
     home: new LoadingPage(), //加载页面
+    /*builder:(BuildContext context, Widget child) {
+      return FlutterEasyLoading(
+        child:child,
+      );
+    },*/
   );
 }

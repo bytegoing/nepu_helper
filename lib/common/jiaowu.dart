@@ -359,9 +359,13 @@ class Jiaowu {
       }
     }
     var page = parseHtmlDocument(pageStr);
-    var trElemChildren = page.getElementById("1").children;
-    for(int i = 0;i <= 6;i++) {
-      detail.add(trElemChildren[i].innerText);
+    try {
+      var trElemChildren = page.getElementById("1").children;
+      for(int i = 0;i <= 6;i++) {
+        detail.add(trElemChildren[i].innerText);
+      }
+    } catch(e) {
+      detail = ["","","","","","",""];
     }
     return detail;
     // 0: 平时成绩  1: 平时成绩比列  2: 期中成绩   3: 期中成绩比列   4: 期末成绩   5: 期末成绩比列  6: 总成绩

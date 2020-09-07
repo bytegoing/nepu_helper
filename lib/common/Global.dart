@@ -8,7 +8,7 @@ class Global {
   static SharedPreferences _prefs;
   static String jSessionID = "";
   static Profile profile = Profile();
-  static bool ifReportDio = false;
+  static bool ifReportDio = true;
 
   static bool get isRelease => bool.fromEnvironment("dart.vm.product");
 

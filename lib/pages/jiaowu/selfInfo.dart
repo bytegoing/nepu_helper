@@ -51,7 +51,7 @@ class SelfInfo extends StatelessWidget {
                                       child: Text("姓名"),
                                     ),
                                     Expanded(
-                                      flex: 4,
+                                      flex: 5,
                                       child: Text(_info["姓名"]),
                                     )
                                   ]
@@ -63,7 +63,7 @@ class SelfInfo extends StatelessWidget {
                                       child: Text("出生日期"),
                                     ),
                                     Expanded(
-                                      flex: 1,
+                                      flex: 2,
                                       child: Text(_info["出生日期"]),
                                     ),
                                     Expanded(
@@ -83,7 +83,7 @@ class SelfInfo extends StatelessWidget {
                                       child: Text("身份证号"),
                                     ),
                                     Expanded(
-                                      flex: 4,
+                                      flex: 5,
                                       child: Text(_info["身份证编号"]),
                                     )
                                   ]
@@ -95,7 +95,7 @@ class SelfInfo extends StatelessWidget {
                                       child: Text("院系"),
                                     ),
                                     Expanded(
-                                      flex: 4,
+                                      flex: 5,
                                       child: Text(_info["院系"]),
                                     )
                                   ]
@@ -107,7 +107,7 @@ class SelfInfo extends StatelessWidget {
                                       child: Text("班级"),
                                     ),
                                     Expanded(
-                                      flex: 2,
+                                      flex: 3,
                                       child: Text(_info["班级"]),
                                     ),
                                     Expanded(
@@ -127,7 +127,7 @@ class SelfInfo extends StatelessWidget {
                                       child: Text("入学日期"),
                                     ),
                                     Expanded(
-                                      flex: 1,
+                                      flex: 2,
                                       child: Text(_info["入学日期"]),
                                     ),
                                     Expanded(

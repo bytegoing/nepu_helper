@@ -144,7 +144,9 @@ class _scoreQueryPageState extends State<scoreQueryPage> {
                           Expanded(
                             flex: 2,
                             child: Text(
-                              scoreList[index][0] + "学期"
+                              scoreList[index][0] + "学期",
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
                             )
                           ),
                           Expanded(
@@ -160,9 +162,9 @@ class _scoreQueryPageState extends State<scoreQueryPage> {
                             ),
                           ),
                           Expanded(
-                            flex: 2,
+                            flex: 1,
                             child: Text(
-                              "点击查看详情"
+                              "查看详情"
                             ),
                           )
                         ]
