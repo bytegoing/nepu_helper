@@ -370,4 +370,36 @@ class Jiaowu {
     return detail;
     // 0: 平时成绩  1: 平时成绩比列  2: 期中成绩   3: 期中成绩比列   4: 期末成绩   5: 期末成绩比列  6: 总成绩
   }
+
+  Future<List> getClassPlan() async {
+    print("获取教学计划");
+    var dio = await getDio();
+    List classPlan = [];
+    String pageStr;
+    try {
+      pageStr = (await dio.get("/pyfajhgl.do?method=toViewJxjhXs&tktime=" + DateTime.now().toString())).data.toString();
+    } catch(e) {
+      if(Global.ifReportDio) {
+        throw e;
+      } else {
+        throw new Exception("网络错误!请稍后重试...");
+      }
+    }
+    var page = parseHtmlDocument(pageStr);
+    for(int i = 1;;i++) {
+      var singleElem = page.getElementById(i.toString());
+      List singleList = [];
+      String str = "";
+      if(singleElem == null) break;
+      var single = singleElem.children;
+      for(int j = 1;j <= 11;j++) {
+        singleList.add(single[j].innerText.toString());
+      }
+      //0: 学期    1: 课程编码  2: 课程名称  3: 学时  4: 学分  5: 课程体系
+      //6: 课程属性 7: 方向  8: 方向年度  9: 考核方式  10:开课单位
+      classPlan.add(singleList);
+    }
+    classPlan.sort((left, right) => right[0].compareTo(left[0])); //降序排列
+    return classPlan;
+  }
 }

@@ -94,7 +94,7 @@ class _scoreQueryPageState extends State<scoreQueryPage> {
                           }
                       )
                   )
-                  : Container(padding: EdgeInsets.only(top: 10.0), alignment: Alignment.center, child: Text("本学期暂无成绩"),),//scoreWidget,
+                  : Container(padding: EdgeInsets.only(top: 10.0), alignment: Alignment.center, child: Text("该学期暂无成绩"),),//scoreWidget,
                 ]
             )
           )
@@ -305,8 +305,9 @@ class _scoreQueryPageState extends State<scoreQueryPage> {
             ),
           ),
           actions: <Widget>[
-            new RaisedButton(
+            new FlatButton(
                 child: new Text("返回"),
+                textColor: Colors.blueAccent,
                 onPressed: () {
                   Navigator.of(context).pop();
                 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:nepu_helper/pages/jiaowu/scoreQuery.dart';
+import 'package:nepu_helper/pages/jiaowu/classPlan.dart';
 import 'package:nepu_helper/pages/loginForm.dart';
 import 'package:nepu_helper/common/Global.dart';
 import 'package:nepu_helper/common/jiaowu.dart';
@@ -97,20 +98,11 @@ class _JiaowuPageState extends State<JiaowuPage> {
                             Expanded(
                               flex: 2,
                               child: RaisedButton(
-                                onPressed: () async {
+                                onPressed: () {
                                   //个人信息
-                                  EasyLoading.show(status: "正在获取...");
-                                  var info;
-                                  try {
-                                    info = await Jiaowu().getInfo();
-                                  } catch(e) {
-                                    EasyLoading.showError("加载失败! " + e.toString());
-                                    return;
-                                  }
                                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                    return SelfInfo(info);
+                                    return SelfInfo();
                                   }));
-                                  EasyLoading.dismiss();
                                 },
                                 child: Text("个人信息", style: TextStyle(fontSize: 12)),
                                 color: Colors.blueAccent,
@@ -206,6 +198,11 @@ class _JiaowuPageState extends State<JiaowuPage> {
       case "成绩查询":
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return scoreQueryPage();
+        }));
+        break;
+      case "教学计划":
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return classPlanPage();
         }));
         break;
       default:
