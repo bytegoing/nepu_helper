@@ -4,8 +4,10 @@ class Profile {
   String xm;
   String dwUsr;
   String dwPass;
+  String dwToken;
+  String dwXm;
 
-  Profile({this.xh, this.pass, this.xm, this.dwUsr, this.dwPass});
+  Profile({this.xh, this.pass, this.xm, this.dwUsr, this.dwPass, this.dwToken, this.dwXm});
 
   Profile.fromJson(Map<String, dynamic> json) {
     xh = json['xh'];
@@ -13,6 +15,8 @@ class Profile {
     xm = json['xm'];
     dwUsr = json['dwUsr'];
     dwPass = json['dwPass'];
+    dwToken = json['dwToken'];
+    dwXm = json['dwXm'];
   }
 
   Map<String, dynamic> toJson() {
@@ -22,6 +26,8 @@ class Profile {
     data['xm'] = this.xm;
     data['dwUsr'] = this.dwUsr;
     data['dwPass'] = this.dwPass;
+    data['dwToken'] = this.dwToken;
+    data['dwXm'] = this.dwXm;
     return data;
   }
 }

@@ -402,4 +402,37 @@ class Jiaowu {
     classPlan.sort((left, right) => right[0].compareTo(left[0])); //降序排列
     return classPlan;
   }
+
+  Future<void> findPassword(String username, String id) async {
+    print("找回密码: " + username + " " + id);
+    var dio = await getDio(addCookie: false, autoLogin: false);
+    String pageStr;
+    Map<String, dynamic> formData = {
+      "account": username,
+      "sfzjh": id,
+    };
+    try {
+      pageStr = (await dio.post("/yhxigl.do?method=resetPasswd",
+          data: formData,
+          options: Options(contentType:Headers.formUrlEncodedContentType))).data.toString();
+    } catch(e) {
+      if(Global.ifReportDio) {
+        throw e;
+      } else {
+        throw new Exception("网络错误!请稍后重试...");
+      }
+    }
+    if(pageStr.contains("身份证件号输入错误")) {
+      throw new Exception("身份证件号输入错误或者你在系统中没有身份证号");
+    } else if(pageStr.contains("密码已重置为身份证号的后六位")) {
+      return;
+    } else {
+      throw new Exception("结果未知!");
+    }
+  }
+
+  Future<void> changePassword(String oldPass, String newPass) {
+    print("更改密码");
+
+  }
 }

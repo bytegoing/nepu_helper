@@ -7,6 +7,9 @@ import 'package:nepu_helper/models/profile.dart';
 class Global {
   static SharedPreferences _prefs;
   static String jSessionID = "";
+  static String lastAuthenticityToken = "";
+  static String lastAuthenticityParam = "authenticity_token";
+  static String lastCookie = "";
   static Profile profile = Profile();
   static bool ifReportDio = true;
 
@@ -47,6 +50,8 @@ class Global {
     print("Removing DW Profile");
     profile.dwUsr = "";
     profile.dwPass = "";
+    profile.dwToken = "";
+    profile.dwXm = "";
     saveProfile();
   }
 
