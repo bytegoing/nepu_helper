@@ -539,25 +539,24 @@ class Jiaowu {
       var tStr = matches.elementAt(i).group(0).toString();
       if(tStr.contains("width=\"50\"") && tStr.contains("vJsMod")) {
         //Start of an Class
-        print("Detect a new Class!");
+        print("Detected a new Class!");
         nowClass++;
         xkList.add(new List());
       } else {
         RegExp reg = new RegExp("(?<=title=\").*?(?=\")");
         if(reg.hasMatch(tStr)) {
-          print("have Match!");
+          print("Have Title Match!");
           String singleStr = reg.firstMatch(tStr).group(0);
           xkList[nowClass].add(singleStr);
         } else {
-          print("do not have Match!");
+          print("No Title Match!");
           RegExp reg2 = new RegExp(r"(?<=javascript:vJsMod\(').*(?=',400,250\);return false;)");
           if(reg2.hasMatch(tStr)) {
-            print("have link match!");
+            print("Have Link Match!");
             String linkStr = reg2.firstMatch(tStr).group(0).replaceAll("&amp;", "&");
-            print("link=" + linkStr+"=End");
             xkList[nowClass].add(linkStr);
           } else {
-            print("have no link match!");
+            print("No Link Match!");
           }
         }
       }
