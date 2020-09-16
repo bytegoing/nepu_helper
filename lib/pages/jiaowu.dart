@@ -346,6 +346,17 @@ class _JiaowuPageState extends State<JiaowuPage> {
           return classPlanPage();
         }));
         break;
+      case "修改密码":
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return changePasswordForm();
+        }));
+        setState(() {});
+        break;
+      case "学生选课":
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return chooseClassPage();
+        }));
+        break;
       default:
         EasyLoading.showInfo("暂未开放!");
         break;

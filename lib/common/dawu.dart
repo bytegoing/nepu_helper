@@ -137,6 +137,24 @@ class Dawu {
     }
   }
 
+  Future<String> getNeedToKnow() async {
+    var dio = await getDio(addCookie:false, autoLogin: false);
+    Response res;
+    try {
+      res = await dio.get("/users/sign_in");
+    } catch(e) {
+      if(Global.ifReportDio) {
+        throw e;
+      } else {
+        throw new Exception("网络错误!请稍后重试...");
+      }
+    }
+    String pageStr = res.data.toString();
+    RegExp reg = new RegExp("<h3> <strong>选课须知 </strong> </h3>[\s\S]+?</strong>");
+    String needToKnowHtml = reg.firstMatch(pageStr).group(0);
+    return needToKnowHtml;
+  }
+
   Future<void> login(String xh, String password) async {
     var dio = await getDio(autoLogin: false);
     //await _getAuth();

@@ -431,8 +431,164 @@ class Jiaowu {
     }
   }
 
-  Future<void> changePassword(String oldPass, String newPass) {
+  Future<void> changePassword(String oldPass, String newPass) async {
     print("更改密码");
+    var dio = await getDio();
+    String pageStr;
+    Map<String, dynamic> formData = {
+      "oldpassword": oldPass,
+      "password1": newPass,
+      "password2": newPass,
+    };
+    try {
+      pageStr = (await dio.post("/yhxigl.do?method=changMyUserInfo",
+          data: formData,
+          options: Options(contentType:Headers.formUrlEncodedContentType))).data.toString();
+    } catch(e) {
+      if(Global.ifReportDio) {
+        throw e;
+      } else {
+        throw new Exception("网络错误!请稍后重试...");
+      }
+    }
+    if(pageStr.contains("旧密码输入错误")) {
+      throw new Exception("旧密码输入错误!");
+    } else if(pageStr.contains("修改密码成功")) {
+      Global.removeJWProfile();
+      return;
+    } else {
+      throw new Exception("结果未知!");
+    }
+  }
 
+  Future<List> getXkList() async {
+    print("获取选课列表");
+    var dio = await getDio();
+    List xkList = [];
+    String pageStr;
+    try {
+      pageStr = (await dio.get("/xkglAction.do?method=xsxkXsxk&tktime=" + DateTime.now().toString())).data.toString();
+    } catch(e) {
+      if(Global.ifReportDio) {
+        throw e;
+      } else {
+        throw new Exception("网络错误!请稍后重试...");
+      }
+    }
+    var page = parseHtmlDocument(pageStr);
+    for(int i = 1;;i++) {
+      var singleElem = page.getElementById(i.toString());
+      List singleList = [];
+      if(singleElem == null) break;
+      var single = singleElem.children;
+      for(int j = 1;j <= 5;j++) {
+        singleList.add(single[j].innerText.toString());
+      }
+      String str = single[6].innerHtml.toString();
+      singleList.add(str.substring(63, str.length-35).replaceAll("&amp;", "&"));
+      //0: 学期    1: 选课类型  2: 选课阶段  3: 选课开始时间  4: 选课结束时间  5: 选课链接
+      xkList.add(singleList);
+    }
+    return xkList;
+  }
+
+  Future<List> getXkDetail(String url) async {
+    print("获取选课详细信息： " + url);
+    var dio = await getDio();
+    List xkList = [];
+    String pageStr;
+    try {
+      pageStr = (await dio.get(url)).data.toString();
+    } catch(e) {
+      if(Global.ifReportDio) {
+        throw e;
+      } else {
+        throw new Exception("网络错误!请稍后重试...");
+      }
+    }
+    var page = parseHtmlDocument(pageStr);
+    var mainFrmAdd = page.getElementById("mainFrame").getAttribute("src");
+    print("Main Frame Address: " + mainFrmAdd);
+    try {
+      pageStr = (await dio.get(mainFrmAdd)).data.toString();
+    } catch(e) {
+      if(Global.ifReportDio) {
+        throw e;
+      } else {
+        throw new Exception("网络错误!请稍后重试...");
+      }
+    }
+    page = parseHtmlDocument(pageStr);
+    mainFrmAdd = page.getElementById("centerFrame").getAttribute("src");
+    print("Center Frame Address: " + mainFrmAdd);
+    try {
+      pageStr = (await dio.get(mainFrmAdd)).data.toString();
+    } catch(e) {
+      if(Global.ifReportDio) {
+        throw e;
+      } else {
+        throw new Exception("网络错误!请稍后重试...");
+      }
+    }
+    page = parseHtmlDocument(pageStr);
+    var mxhDivStr = page.getElementById("mxhDiv").children[0].innerHtml;
+    RegExp reg = new RegExp("<td.*</td>");
+    Iterable<Match> matches = reg.allMatches(mxhDivStr);
+    int nowClass = -1;
+    for(int i = 0;i < matches.length;i++) {
+      var tStr = matches.elementAt(i).group(0).toString();
+      if(tStr.contains("width=\"50\"") && tStr.contains("vJsMod")) {
+        //Start of an Class
+        print("Detect a new Class!");
+        nowClass++;
+        xkList.add(new List());
+      } else {
+        RegExp reg = new RegExp("(?<=title=\").*?(?=\")");
+        if(reg.hasMatch(tStr)) {
+          print("have Match!");
+          String singleStr = reg.firstMatch(tStr).group(0);
+          xkList[nowClass].add(singleStr);
+        } else {
+          print("do not have Match!");
+          RegExp reg2 = new RegExp(r"(?<=javascript:vJsMod\(').*(?=',400,250\);return false;)");
+          if(reg2.hasMatch(tStr)) {
+            print("have link match!");
+            String linkStr = reg2.firstMatch(tStr).group(0).replaceAll("&amp;", "&");
+            print("link=" + linkStr+"=End");
+            xkList[nowClass].add(linkStr);
+          } else {
+            print("have no link match!");
+          }
+        }
+      }
+    }
+    //print(xkList);
+    return xkList;
+  }
+
+  Future XuanKe(String url) async {
+    print("选课： " + url);
+    var dio = await getDio();
+    String pageStr;
+    try {
+      pageStr = (await dio.get(url)).data.toString();
+    } catch(e) {
+      if(Global.ifReportDio) {
+        throw e;
+      } else {
+        throw new Exception("网络错误!请稍后重试...");
+      }
+    }
+    RegExp reg = new RegExp(r"(?<=alert\(').*(?='\);window.close)");
+    if(reg.hasMatch(pageStr)) {
+      //获取结果
+      String resultStr = reg.firstMatch(pageStr).group(0);
+      if(resultStr.contains("成功")) return;
+      else throw new Exception(resultStr);
+      //print(resultStr);
+    } else {
+      throw new Exception("未知错误!");
+    }
+    print(pageStr);
   }
 }
