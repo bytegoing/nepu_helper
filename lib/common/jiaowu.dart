@@ -29,7 +29,7 @@ class Jiaowu {
     print("新建Dio!");
     Dio dio = Dio();
     dio.options.baseUrl = baseUrl;
-    dio.options.connectTimeout = 6000; //5s
+    dio.options.connectTimeout = 6000; //6s
     dio.options.receiveTimeout = 4000;
     if(addCookie) {
       if(Global.jSessionID == "") print("Dio: Lack jSessionID!");
@@ -578,7 +578,8 @@ class Jiaowu {
         throw new Exception("网络错误!请稍后重试...");
       }
     }
-    RegExp reg = new RegExp(r"(?<=alert\(').*(?='\);window.close)");
+    RegExp reg = new RegExp(r"(?<=alert\(').*(?='\);)");
+    print("PageStr="+pageStr);
     if(reg.hasMatch(pageStr)) {
       //获取结果
       String resultStr = reg.firstMatch(pageStr).group(0);
