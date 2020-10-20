@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
@@ -10,6 +11,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'package:universal_html/parsing.dart';
 import 'package:flutter/services.dart';
+import 'package:nepu_helper/pages/jiaowu/captcha.dart';
+import 'package:encrypt/encrypt.dart' as enc;
+import 'package:xpath_parse/xpath_selector.dart';
 
 class Jiaowu {
   String baseUrl = "http://jwgl.nepu.edu.cn/";
@@ -122,27 +126,42 @@ class Jiaowu {
     return resBody.stream.first;
   }
 
+  Future<void> getCaptchaTextByWidget() async {
+    await Navigator.push(Global.nowContext, MaterialPageRoute(builder: (context) {
+      return CaptchaPage();
+    }));
+  }
   /*Future<String> getCaptchaText(Uint8List uInt8ListImg) async {
     return await JiaowuCaptcha().GetText(uInt8ListImg);
   }*/
+
+  String aesEncrypt(String content, String oKey) {
+    try {
+      final key = enc.Key.fromUtf8(oKey);
+      final encrypter = enc.Encrypter(enc.AES(key, mode: enc.AESMode.ecb));
+      final encrypted = encrypter.encrypt(content, iv: enc.IV.fromLength(16));
+      return encrypted.base64;
+    } catch (err) {
+      print("加密错误:$err");
+      return content;
+    }
+  }
 
   Future<void> login(String xh, String password) async {
     int codeErrorCount = 0;
     while(codeErrorCount < 5) {
       //String captcha = await JiaowuCaptcha().GetText(await getCaptchaIMG());
-
+      await getCaptchaTextByWidget();
+      String captcha = Global.lastCaptcha;
       var dio = await getDio(autoLogin: false);
       Map<String, dynamic> formData = {
-        "USERNAME": xh,
-        "PASSWORD": password,
-        "RANDOMCODE": captcha,
-        "useDogCode": "",
-        "x": 0,
-        "y": 0
+        "account": xh,
+        "pwd": aesEncrypt(password, captcha+captcha+captcha+captcha),
+        "verifycode": captcha,
       };
       Response res;
       try {
-        res = await dio.post("/Logon.do?method=logon", data: formData, options: Options(contentType:Headers.formUrlEncodedContentType));
+        res = await dio.post("/new/login", data: formData, options: Options(contentType:Headers.formUrlEncodedContentType));
       } catch(e) {
         if(Global.ifReportDio) {
           throw e;
@@ -150,33 +169,15 @@ class Jiaowu {
           throw new Exception("网络错误!请稍后重试...");
         }
       }
-      String rtn = res.data.toString();
-      if(rtn.contains("密码错误")) {
-        //密码错误
-        Global.removeJWProfile();
-        throw new Exception("用户名或密码错误");
-      } else if(rtn.contains("验证码错误")) {
-        //再试一次
-        print("验证码错误");
-        codeErrorCount++;
-        continue;
-      } else if(rtn.contains("window.location.href=")) {
+      Map<String, dynamic> rtn = json.decode(res.data.toString());
+      if(rtn['code'] == "0" || rtn['code'] == 0) {
         //OK
         print("登录成功");
         Global.profile.xh = xh;
         Global.profile.pass = password;
-        try {
-          await dio.get("/Logon.do?method=logonBySSO");
-        } catch(e) {
-          if(Global.ifReportDio) {
-            throw e;
-          } else {
-            throw new Exception("网络错误!请稍后重试...");
-          }
-        }
         String mainPageStr;
         try {
-          mainPageStr = (await dio.get("/framework/main.jsp")).data.toString();
+          mainPageStr = (await dio.get("/login!welcome.action")).data.toString();
         } catch(e) {
           if(Global.ifReportDio) {
             throw e;
@@ -184,17 +185,27 @@ class Jiaowu {
             throw new Exception("网络错误!请稍后重试...");
           }
         }
-        var mainPage = parseHtmlDocument(mainPageStr);
-        Global.profile.xm = mainPage.head.children[1].innerHtml.split("[")[0];
+        Global.profile.xm = XPath.source(mainPageStr).query("//div[@class='top'][1]").get().replaceAll(new RegExp(r"\s+\b|\b\s"), "");
+        //Global.profile.xm = mainPage.head.children[1].innerHtml.split("[")[0];
         Global.saveProfile();
         return;
       } else {
-        //未知错误
-        print("未知错误");
-        throw new Exception("未知错误");
+        //NOT OK
+        if (rtn["data"].contains("密码不正确")) {
+          Global.removeJWProfile();
+          throw new Exception("用户名或密码错误");
+        } else if (rtn["data"].contains("验证码")) {
+          //再试一次
+          print("验证码错误");
+          codeErrorCount++;
+          continue;
+        } else {
+          print("未知错误");
+          throw new Exception("未知错误:" + rtn["message"]);
+        }
       }
     }
-    throw new Exception("自动识别验证码错误超过5次，请重试");
+    throw new Exception("验证码错误超过5次，请重试");
   }
 
   Future<Map> getInfo() async {
