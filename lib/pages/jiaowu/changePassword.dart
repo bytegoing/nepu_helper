@@ -18,6 +18,7 @@ class _changePasswordFormState extends State<changePasswordForm> {
 
   @override
   Widget build(BuildContext context) {
+    Global.nowContext = context;
     return new Scaffold(
         appBar: new AppBar(
           title: new Text("修改教务系统密码"),

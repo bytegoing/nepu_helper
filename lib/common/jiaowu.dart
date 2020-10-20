@@ -47,7 +47,7 @@ class Jiaowu {
           print("有账号密码,正在检查有效性");
           String page;
           try {
-            page = (await dio.get("/xszhxxAction.do?method=addStudentPic&tktime=" + DateTime.now().toString())).data.toString();
+            page = (await dio.get("/login!welcome.action")).data.toString();
           } catch(e) {
             if(Global.ifReportDio) {
               throw e;
@@ -55,7 +55,7 @@ class Jiaowu {
               throw new Exception("网络错误!请稍后重试...");
             }
           }
-          if(page.contains("过长时间没有操作")) {
+          if(page.contains("立即登录")) {
             print("登录失效,重新登录");
             await login(Global.profile.xh, Global.profile.pass);
           } else {
@@ -109,7 +109,7 @@ class Jiaowu {
     dio.options.responseType = ResponseType.stream;
     Response res;
     try {
-      res = await dio.get("/verifycode.servlet");
+      res = await dio.get("/yzm?"+ new DateTime.now().millisecondsSinceEpoch.toString());
     }catch(e) {
       if(Global.ifReportDio) {
         throw e;
@@ -122,14 +122,15 @@ class Jiaowu {
     return resBody.stream.first;
   }
 
-  Future<String> getCaptchaText(Uint8List uInt8ListImg) async {
+  /*Future<String> getCaptchaText(Uint8List uInt8ListImg) async {
     return await JiaowuCaptcha().GetText(uInt8ListImg);
-  }
+  }*/
 
   Future<void> login(String xh, String password) async {
     int codeErrorCount = 0;
     while(codeErrorCount < 5) {
-      String captcha = await JiaowuCaptcha().GetText(await getCaptchaIMG());
+      //String captcha = await JiaowuCaptcha().GetText(await getCaptchaIMG());
+
       var dio = await getDio(autoLogin: false);
       Map<String, dynamic> formData = {
         "USERNAME": xh,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:nepu_helper/common/jiaowu.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:nepu_helper/common/Global.dart';
 
 class findPasswordForm extends StatefulWidget {
   @override
@@ -16,6 +17,7 @@ class _findPasswordFormState extends State<findPasswordForm> {
 
   @override
   Widget build(BuildContext context) {
+    Global.nowContext = context;
     return new Scaffold(
         appBar: new AppBar(
           title: new Text("找回教务系统密码"),

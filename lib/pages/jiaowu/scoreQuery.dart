@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nepu_helper/common/jiaowu.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:nepu_helper/common/Global.dart';
 
 class scoreQueryPage extends StatefulWidget {
   @override
@@ -46,6 +47,7 @@ class _scoreQueryPageState extends State<scoreQueryPage> {
 
   @override
   Widget build(BuildContext context) {
+    Global.nowContext = context;
     return new Scaffold(
         appBar: new AppBar(
           title: new Text("成绩查询"),

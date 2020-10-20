@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nepu_helper/common/jiaowu.dart';
 import 'package:nepu_helper/pages/jiaowu/chooseClassDetail.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:nepu_helper/common/Global.dart';
 
 class chooseClassPage extends StatefulWidget {
   @override
@@ -43,6 +44,7 @@ class _chooseClassPageState extends State<chooseClassPage> {
 
   @override
   Widget build(BuildContext context) {
+    Global.nowContext = context;
     return new Scaffold(
       appBar: new AppBar(
         title: new Text("学生选课"),

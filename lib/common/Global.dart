@@ -4,14 +4,18 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nepu_helper/models/profile.dart';
 
+import 'package:flutter/material.dart';
+
 class Global {
   static SharedPreferences _prefs;
   static String jSessionID = "";
   static String lastAuthenticityToken = "";
   static String lastAuthenticityParam = "authenticity_token";
   static String lastCookie = "";
+  static String lastCaptcha = "";
   static Profile profile = Profile();
   static bool ifReportDio = true;
+  static BuildContext nowContext;
 
   static bool get isRelease => bool.fromEnvironment("dart.vm.product");
 

@@ -4,6 +4,7 @@ import 'package:nepu_helper/common/jiaowu.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:nepu_helper/pages/jiaowu/findPassword.dart';
+import 'package:nepu_helper/common/Global.dart';
 
 class LoginForm extends StatefulWidget {
   @override
@@ -17,6 +18,7 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
+    Global.nowContext = context;
     return new Scaffold(
         appBar: new AppBar(
           title: new Text("教务系统登录"),
