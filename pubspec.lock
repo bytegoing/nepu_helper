@@ -21,7 +21,7 @@ packages:
       name: asn1lib
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.8.1"
+    version: "0.6.5"
   async:
     dependency: transitive
     description:
@@ -190,13 +190,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.0"
-  encrypt:
-    dependency: "direct main"
-    description:
-      name: encrypt
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "4.1.0"
   fake_async:
     dependency: transitive
     description:
@@ -457,13 +450,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.3"
-  pointycastle:
-    dependency: transitive
-    description:
-      name: pointycastle
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.0.0"
   pool:
     dependency: transitive
     description:
@@ -581,6 +567,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.9.5"
+  steel_crypt:
+    dependency: "direct main"
+    description:
+      name: steel_crypt
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.7.1+1"
   stream_channel:
     dependency: transitive
     description:

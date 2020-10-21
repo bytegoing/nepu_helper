@@ -31,7 +31,7 @@ class SelfInfo extends StatelessWidget {
                               child: new ListView(
                                   padding: const EdgeInsets.all(15),
                                   children: <Widget>[
-                                    Column(
+                                    /*Column(
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: <Widget>[
                                           Image(
@@ -43,7 +43,7 @@ class SelfInfo extends StatelessWidget {
                                           Text("学籍照片"),
                                           Text(""),
                                         ]
-                                    ),
+                                    ),*/
                                     Row(
                                         children: <Widget>[
                                           Expanded(
@@ -58,14 +58,14 @@ class SelfInfo extends StatelessWidget {
                                                 overflow: TextOverflow.ellipsis
                                             ),
                                           ),
-                                          Expanded(
+                                          /*Expanded(
                                             flex: 1,
                                             child: Text("性别"),
                                           ),
                                           Expanded(
                                             flex: 1,
                                             child: Text(value.data["性别"])
-                                          )
+                                          )*/
                                         ]
                                     ),
                                     Row(
@@ -80,7 +80,7 @@ class SelfInfo extends StatelessWidget {
                                         )
                                       ]
                                     ),
-                                    Row(
+                                    /*Row(
                                         children: <Widget>[
                                           Expanded(
                                             flex: 2,
@@ -99,7 +99,7 @@ class SelfInfo extends StatelessWidget {
                                             child: Text(value.data["入学日期"]),
                                           ),
                                         ]
-                                    ),
+                                    ),*/
                                     Row(
                                         children: <Widget>[
                                           Expanded(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:nepu_helper/common/Global.dart';
 import 'package:nepu_helper/common/jiaowu.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CaptchaPage extends StatefulWidget {
   @override
@@ -29,27 +30,52 @@ class _captchaPageState extends State<CaptchaPage> {
                   child: new FlutterEasyLoading(
                       child: new Padding(
                           padding: EdgeInsets.all(15),
-                          child: new Row(
+                          child: new Column(
                             children: <Widget>[
-                              new Image.memory(value.data),
-                              new TextField(
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.all(10.0),
-                                  icon: Icon(Icons.text_fields),
-                                  labelText: '请输入验证码',
-                                  helperText: '请输入验证码',
+                              new Expanded(
+                                child: new Center(
+                                    child: new Container(
+                                      child: new Image.memory(
+                                        value.data,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    )
                                 ),
-                                onChanged: _textFieldChanged,
-                                autofocus: false,
+                                flex: 1,
                               ),
-                              new FlatButton(
-                                  child: new Text("返回"),
-                                  textColor: Colors.blueAccent,
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  }
+                              new Expanded(
+                                child: new TextField(
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.all(10.0),
+                                    icon: Icon(Icons.text_fields),
+                                    labelText: '请输入验证码',
+                                    helperText: '请输入验证码',
+                                  ),
+                                  onChanged: _textFieldChanged,
+                                  autofocus: false,
+                                ),
+                                flex: 1,
                               ),
+                              new Expanded(
+                                child: new FlatButton(
+                                    child: new Text("确认"),
+                                    textColor: Colors.blueAccent,
+                                    onPressed: () {
+                                      if(Global.lastCaptcha.length <= 0) {
+                                        Fluttertoast.showToast(
+                                          msg: "请输入验证码!",
+                                          gravity: ToastGravity.TOP,
+                                          backgroundColor: Colors.grey,
+                                          fontSize: 16,
+                                        );
+                                      } else {
+                                        Navigator.of(context).pop();
+                                      }
+                                    }
+                                ),
+                                flex: 1,
+                              )
                             ]
                           )
                       )

@@ -27,6 +27,7 @@ class _JiaowuPageState extends State<JiaowuPage> {
 
   @override
   Widget build(BuildContext context) {
+    Global.nowContext = context;
     return new MaterialApp(
       //home: new LoginRoute()
         home: new Scaffold(
@@ -114,9 +115,10 @@ class _JiaowuPageState extends State<JiaowuPage> {
                               child: RaisedButton(
                                 onPressed: () {
                                   //个人信息
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                  /*Navigator.push(context, MaterialPageRoute(builder: (context) {
                                     return SelfInfo();
-                                  }));
+                                  }));*/
+                                  _onClick("个人信息");
                                 },
                                 child: Text("个人信息", style: TextStyle(fontSize: 12)),
                                 color: Colors.blueAccent,
@@ -337,14 +339,15 @@ class _JiaowuPageState extends State<JiaowuPage> {
     }
     switch(type) {
       case "成绩查询":
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return scoreQueryPage();
-        }));
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => scoreQueryPage()));
+        setState(() {});
+        print("OK");
         break;
       case "教学计划":
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return classPlanPage();
         }));
+        setState(() {});
         break;
       case "修改密码":
         Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -356,6 +359,7 @@ class _JiaowuPageState extends State<JiaowuPage> {
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return chooseClassPage();
         }));
+        setState(() {});
         break;
       default:
         EasyLoading.showInfo("暂未开放!");

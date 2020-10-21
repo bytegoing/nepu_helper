@@ -12,8 +12,10 @@ import 'dart:io';
 import 'package:universal_html/parsing.dart';
 import 'package:flutter/services.dart';
 import 'package:nepu_helper/pages/jiaowu/captcha.dart';
-import 'package:encrypt/encrypt.dart' as enc;
+import 'package:steel_crypt/steel_crypt.dart';
 import 'package:xpath_parse/xpath_selector.dart';
+import 'package:nepu_helper/widget/renamedialog.dart';
+import 'package:nepu_helper/widget/renamedialogcontent.dart';
 
 class Jiaowu {
   String baseUrl = "http://jwgl.nepu.edu.cn/";
@@ -113,7 +115,7 @@ class Jiaowu {
     dio.options.responseType = ResponseType.stream;
     Response res;
     try {
-      res = await dio.get("/yzm?"+ new DateTime.now().millisecondsSinceEpoch.toString());
+      res = await dio.get("/yzm?d="+ new DateTime.now().millisecondsSinceEpoch.toString());
     }catch(e) {
       if(Global.ifReportDio) {
         throw e;
@@ -123,35 +125,90 @@ class Jiaowu {
     }
     ResponseBody resBody = res.data;
     print("Get Captcha IMG OK!");
-    return resBody.stream.first;
+    Uint8List imgList = await resBody.stream.first;
+    //print(base64Encode(imgList));
+    return imgList;
   }
 
-  Future<void> getCaptchaTextByWidget() async {
-    await Navigator.push(Global.nowContext, MaterialPageRoute(builder: (context) {
-      return CaptchaPage();
-    }));
+  Future<bool> getCaptchaTextByWidget() async {
+    Global.lastCaptcha = "";
+    TextEditingController _vc = new TextEditingController();
+    Uint8List _img = await getCaptchaIMG();
+    await showDialog(
+        barrierDismissible: false,
+        context: Global.nowContext,
+        builder: (context) {
+          return RenameDialog(
+            contentWidget: RenameDialogContent(
+              title: "请输入验证码",
+              okBtnTap: () {
+                Global.lastCaptcha = _vc.text;
+              },
+              vc: _vc,
+              cancelBtnTap: () {},
+              img: _img,
+            ),
+          );
+        });
+    print("验证码:"+Global.lastCaptcha);
+    if(Global.lastCaptcha.length <= 0) return false;
+    else return true;
   }
+
   /*Future<String> getCaptchaText(Uint8List uInt8ListImg) async {
     return await JiaowuCaptcha().GetText(uInt8ListImg);
   }*/
 
-  String aesEncrypt(String content, String oKey) {
-    try {
-      final key = enc.Key.fromUtf8(oKey);
-      final encrypter = enc.Encrypter(enc.AES(key, mode: enc.AESMode.ecb));
-      final encrypted = encrypter.encrypt(content, iv: enc.IV.fromLength(16));
-      return encrypted.base64;
-    } catch (err) {
-      print("加密错误:$err");
-      return content;
+  static toHex(Uint8List bArr) {
+    int length;
+    if (bArr == null || (length = bArr.length) <= 0) {return "";}
+    Uint8List cArr = new Uint8List(length << 1);
+    int i = 0;
+    for (int i2 = 0; i2 < length; i2++) {
+      int i3 = i + 1;
+      var cArr2 = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
+      var index = (bArr[i2] >> 4) & 15;
+      cArr[i] = cArr2[index].codeUnitAt(0);
+      i = i3 + 1;
+      cArr[i3] = cArr2[bArr[i2] & 15].codeUnitAt(0);
     }
+    return new String.fromCharCodes(cArr);
+  }
+
+  static hex(int c) {
+    if (c >= '0'.codeUnitAt(0) && c <= '9'.codeUnitAt(0)) {return c - '0'.codeUnitAt(0);}
+    if (c >= 'A'.codeUnitAt(0) && c <= 'F'.codeUnitAt(0)) {return (c - 'A'.codeUnitAt(0)) + 10;}
+  }
+
+  static toUnitList(String str) {
+    int length = str.length;
+    if (length % 2 != 0) {
+      str = "0" + str;
+      length++;
+    }
+    List<int> s = str.toUpperCase().codeUnits;
+    Uint8List bArr = Uint8List(length >> 1);
+    for (int i = 0; i < length; i += 2) {
+      bArr[i >> 1] = ((hex(s[i]) << 4) | hex(s[i + 1]));
+    }
+    return bArr;
+  }
+
+  String aesEncrypt(String plainText, String key) {
+    print("AES Info: $plainText, $key");
+    var Encrypter = AesCrypt(key, 'ecb', 'pkcs7');
+    var EncryptedData = Encrypter.encrypt(plainText);
+    var list = Base64Decoder().convert(EncryptedData);
+    return toHex(list).toString().toLowerCase();
   }
 
   Future<void> login(String xh, String password) async {
     int codeErrorCount = 0;
     while(codeErrorCount < 5) {
       //String captcha = await JiaowuCaptcha().GetText(await getCaptchaIMG());
-      await getCaptchaTextByWidget();
+      if(!await getCaptchaTextByWidget()) {
+        throw new Exception("请输入验证码!");
+      }
       String captcha = Global.lastCaptcha;
       var dio = await getDio(autoLogin: false);
       Map<String, dynamic> formData = {
@@ -169,7 +226,7 @@ class Jiaowu {
           throw new Exception("网络错误!请稍后重试...");
         }
       }
-      Map<String, dynamic> rtn = json.decode(res.data.toString());
+      var rtn = jsonDecode(res.toString());
       if(rtn['code'] == "0" || rtn['code'] == 0) {
         //OK
         print("登录成功");
@@ -185,23 +242,22 @@ class Jiaowu {
             throw new Exception("网络错误!请稍后重试...");
           }
         }
-        Global.profile.xm = XPath.source(mainPageStr).query("//div[@class='top'][1]").get().replaceAll(new RegExp(r"\s+\b|\b\s"), "");
-        //Global.profile.xm = mainPage.head.children[1].innerHtml.split("[")[0];
+        Global.profile.xm = XPath.source(mainPageStr).query("//div[@class='top']/text()").list()[0];
         Global.saveProfile();
         return;
       } else {
         //NOT OK
-        if (rtn["data"].contains("密码不正确")) {
+        /*if (rtn["data"].contains("密码不正确")) {
           Global.removeJWProfile();
           throw new Exception("用户名或密码错误");
-        } else if (rtn["data"].contains("验证码")) {
+        } else */
+        if (rtn["data"].contains("验证码")) {
           //再试一次
           print("验证码错误");
           codeErrorCount++;
           continue;
         } else {
-          print("未知错误");
-          throw new Exception("未知错误:" + rtn["message"]);
+          throw new Exception(rtn["message"]);
         }
       }
     }
@@ -213,7 +269,7 @@ class Jiaowu {
     var dio = await getDio();
     String infoPageStr;
     try {
-      infoPageStr = (await dio.get("/xszhxxAction.do?method=addStudentPic&tktime=" + DateTime.now().toString())).data.toString();
+      infoPageStr = (await dio.get("/new/student/xjkpxx/edit.page")).toString();
     } catch(e) {
       if(Global.ifReportDio) {
         throw e;
@@ -221,66 +277,33 @@ class Jiaowu {
         throw new Exception("网络错误!请稍后重试...");
       }
     }
-    var infoPage = parseHtmlDocument(infoPageStr);
-    RegExp reg = new RegExp(r"<td.*</td>");
-    Iterable<Match> matches = reg.allMatches(infoPage.getElementById("xjkpTable").innerHtml);
-    bool breakNext = false;
-    for(int i = 0;i < matches.length;i++) {
-      var str = matches.elementAt(i).group(0);
-      if(breakNext) {
-        breakNext = false;
-        continue;
-      }
-      if(str.contains("院系：")) {
-        info["院系"] = str.substring(19, str.length - 5);
-      } else if(str.contains("专业：")) {
-        info["专业"] = str.substring(19, str.length - 5);
-      } else if(str.contains("学制：")) {
-        info["学制"] = str.substring(7, str.length - 5);
-      } else if(str.contains("班级：")) {
-        info["班级"] = str.substring(7, str.length - 5);
-      } else if(str == "<td>姓名</td>") {
-        var str1 = matches.elementAt(i+1).group(0);
-        if(info["姓名"] == null || info["姓名"].isEmpty) {
-          info["姓名"] = str1.substring(5, str1.length - 5);
-        }
-        breakNext = true;
-      } else if(str == "<td>性别</td>") {
-        var str1 = matches.elementAt(i+1).group(0);
-        info["性别"] = str1.substring(5, str1.length - 5);
-        breakNext = true;
-      } else if(str == "<td>出生日期</td>") {
-        var str1 = matches.elementAt(i+1).group(0);
-        info["出生日期"] = str1.substring(5, str1.length - 5);
-        breakNext = true;
-      } else if(str == "<td>本人电话</td>") {
-        var str1 = matches.elementAt(i+1).group(0);
-        info["本人电话"] = str1.substring(5, str1.length - 5);
-        breakNext = true;
-      } else if(str == "<td>入学日期</td>") {
-        var str1 = matches.elementAt(i+1).group(0);
-        info["入学日期"] = str1.substring(17, str1.length - 5);
-        breakNext = true;
-      } else if(str == "<td>入学考号</td>") {
-        var str1 = matches.elementAt(i+1).group(0);
-        info["入学考号"] = str1.substring(17, str1.length - 5);
-        breakNext = true;
-      } else if(str == "<td>身份证编号</td>") {
-        var str1 = matches.elementAt(i+1).group(0);
-        info["身份证编号"] = str1.substring(17, str1.length - 5);
-        breakNext = true;
-      }
-    }
+    var infoList1 = XPath.source(infoPageStr).query("//label/text()").list();
+    info["入学年份"] = infoList1[2];
+    info["院系"] = infoList1[3];
+    info["专业"] = infoList1[4];
+    info["班级"] = infoList1[6];
+    info["所在年级"] = infoList1[7];
+    info["学制"] = infoList1[8];
+    info["所在校区"] = infoList1[9];
+    info["学生状态"] = infoList1[10];
+    info["学籍状态"] = infoList1[11];
+    info["本人电话"] = XPath.source(infoPageStr).query("//input[@id='dh']/text()").get();
+    info["姓名拼音"] = XPath.source(infoPageStr).query("//input[@id='py']/text()").get();
+    info["本人电话"] = XPath.source(infoPageStr).query("//input[@id='dh']/text()").get();
+    info["找回密码凭据"] = XPath.source(infoPageStr).query("//input[@id='mmtip']/text()").get();
+    info["身份证编号"] = XPath.source(infoPageStr).query("//input[@id='sfzh']/text()").get();
+    info["入学考号"] = XPath.source(infoPageStr).query("//input[@id='ksh']/text()").get();
+    print(info);
     return info;
   }
 
-  Future<List> getScoreXQ() async {
-    print("获取成绩学期...");
+  Future<List> getScoreInfo() async {
+    print("获取成绩学期和计划类型...");
     List<DropdownMenuItem<dynamic>> scoreXQ = [];
     var dio = await getDio();
     String pageStr;
     try {
-      pageStr = (await dio.get("/jiaowu/cjgl/xszq/query_xscj.jsp")).data.toString();
+      pageStr = (await dio.get("/xskccjxx!xskccj.action")).toString();
     } catch(e) {
       if(Global.ifReportDio) {
         throw e;
@@ -288,32 +311,39 @@ class Jiaowu {
         throw new Exception("网络错误!请稍后重试...");
       }
     }
-    RegExp reg = new RegExp("<select name=\"kksj\" id=\"kksj\" style=\"width:150px\" size=1><option value=\"\">---请选择---</option>.*</select>");
-    String optionStr = reg.firstMatch(pageStr).group(0).substring(92);
-    Iterable<Match> matches = new RegExp("<option value=\"[0-9\\\\-]*\">[0-9\\\\-]*</option>").allMatches(optionStr);
-    scoreXQ.add(DropdownMenuItem(child: Text("全部学期"), value: ""));
-    for(int i = 0;i < matches.length;i++) {
-      var str = matches.elementAt(i).group(0);
-      scoreXQ.add(DropdownMenuItem(child: Text(str.substring(str.indexOf('>'), str.indexOf("</"))), value: str.substring(15, str.lastIndexOf("\""))));
+    var pageStrXPath = XPath.source(pageStr);
+    List<DropdownMenuItem<String>> xnxqList = [];
+    List<DropdownMenuItem<String>> jhlxList = [];
+    var xnxqNameList = pageStrXPath.query("//select[@id='xnxqdm']/option/text()").list();
+    var xnxqValueList = pageStrXPath.query("//select[@id='xnxqdm']/option/@value").list();
+    var jhlxNameList = pageStrXPath.query("//select[@id='jhlx']/option/text()").list();
+    var jhlxValueList = pageStrXPath.query("//select[@id='jhlx']/option/@value").list();
+    for(int i = 0;i < xnxqNameList.length;i++) {
+      xnxqList.add(DropdownMenuItem(child: Text(xnxqNameList[i]), value: xnxqValueList[i]));
     }
-    return scoreXQ;
+    for(int i = 0;i < jhlxNameList.length;i++) {
+      jhlxList.add(DropdownMenuItem(child: Text(jhlxNameList[i]), value: jhlxValueList[i]));
+    }
+    return [xnxqList, jhlxList];
   }
 
-  Future<List> getScore(String xq) async {
+  Future<List> getScore(String xq, String jh) async {
     print("获取成绩");
     List score = [];
     var dio = await getDio();
     Map<String, dynamic> formData = {
-      "kksj": xq,
-      "kcxz": "", //课程性质
-      "kcmc": "", //课程名称
-      "xsfs": "" //显示方式
+      "xnxqdm": xq,
+      "jhlxdm": jh, //计划类型
+      "page": 1,
+      "rows": 9999,
+      "sort": "xnxqdm",
+      "order": "asc"
     };
     String pageStr;
     try {
-      pageStr = (await dio.post("/xszqcjglAction.do?method=queryxscj",
+      pageStr = (await dio.post("/xskccjxx!getDataList.action",
           data: formData,
-          options: Options(contentType:Headers.formUrlEncodedContentType))).data.toString();
+          options: Options(contentType:Headers.formUrlEncodedContentType))).toString();
     } catch(e) {
       if(Global.ifReportDio) {
         throw e;
@@ -321,48 +351,17 @@ class Jiaowu {
         throw new Exception("网络错误!请稍后重试...");
       }
     }
-    var page = parseHtmlDocument(pageStr);
-    var jdElem = page.getElementById("tblBm").innerHtml;
-    var xfList = [];
-    var str = RegExp("已修读<span>[0-9.]*</span>学分，").firstMatch(jdElem).group(0);
-    xfList.add(str.substring(9, str.length - 10));
-    str = RegExp("平均学分绩点<span>[0-9.]*。</span>").firstMatch(jdElem).group(0);
-    xfList.add(str.substring(12, str.length - 8));
-    str = RegExp("共<font color=\"#FF0000\">[0-9]*</font>条").firstMatch(jdElem).group(0);
-    xfList.add(int.parse(str.substring(23, str.length - 8)));
-    score.add(xfList);
-    for(int i = 1;;i++) {
-      var singleElem = page.getElementById(i.toString());
-      List singleList = [];
-      String str = "";
-      if(singleElem == null) break;
-      var single = singleElem.children;
-      for(int j = 3;j <= 4;j++) {
-        singleList.add(single[j].innerText.toString()); //0: 学期   1: 课程名称
-      }
-      singleList.add(int.parse(single[5].innerText.toString())); //2: 总成绩
-      if(singleList[2] >= 60) { //3: 是否通过标志
-        singleList.add("√");
-      } else {
-        singleList.add("×");
-      }
-      str = single[5].innerHtml.toString();
-      singleList.add(str.substring(str.indexOf("JsMod(")+7, str.indexOf(",630,360)")-1).replaceAll("&amp;", "&")); //4: 成绩比例地址
-      for(int j = 7;j <= 11;j++) {
-        singleList.add(single[j].innerText.toString()); //5: 课程性质  6: 课程类别  7: 学时  8: 学分  9:考试性质
-      }
-      score.add(singleList);
-    }
-    return score;
+    var rtnJson = jsonDecode(pageStr);
+    return rtnJson["rows"];
   }
 
-  Future<List> getScoreDetail(String url) async {
+  Future<List> getScoreDetail(String cjdm) async {
     print("获取成绩比例");
     List detail = [];
     var dio = await getDio();
     String pageStr;
     try {
-      pageStr = (await dio.get(url)).data.toString();
+      pageStr = (await dio.get("/xskccjxx!getDetail.action?cjdm="+cjdm)).toString();
     } catch(e) {
       if(Global.ifReportDio) {
         throw e;
@@ -370,17 +369,8 @@ class Jiaowu {
         throw new Exception("网络错误!请稍后重试...");
       }
     }
-    var page = parseHtmlDocument(pageStr);
-    try {
-      var trElemChildren = page.getElementById("1").children;
-      for(int i = 0;i <= 6;i++) {
-        detail.add(trElemChildren[i].innerText);
-      }
-    } catch(e) {
-      detail = ["","","","","","",""];
-    }
-    return detail;
-    // 0: 平时成绩  1: 平时成绩比列  2: 期中成绩   3: 期中成绩比列   4: 期末成绩   5: 期末成绩比列  6: 总成绩
+    var rtnJson = jsonDecode(pageStr);
+    return rtnJson;
   }
 
   Future<List> getClassPlan() async {
