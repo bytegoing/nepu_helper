@@ -14,7 +14,7 @@ class _captchaPageState extends State<CaptchaPage> {
 
   @override
   Widget build(BuildContext context) {
-    Global.nowContext = context;
+    //Global.nowContext = context;
     //获取信息
     return FutureBuilder<Uint8List>(
       future: Jiaowu().getCaptchaIMG(),
@@ -62,7 +62,7 @@ class _captchaPageState extends State<CaptchaPage> {
                                     child: new Text("确认"),
                                     textColor: Colors.blueAccent,
                                     onPressed: () {
-                                      if(Global.lastCaptcha.length <= 0) {
+                                      /*if(Global.lastCaptcha.length <= 0) {
                                         Fluttertoast.showToast(
                                           msg: "请输入验证码!",
                                           gravity: ToastGravity.TOP,
@@ -71,7 +71,7 @@ class _captchaPageState extends State<CaptchaPage> {
                                         );
                                       } else {
                                         Navigator.of(context).pop();
-                                      }
+                                      }*/
                                     }
                                 ),
                                 flex: 1,
@@ -98,6 +98,6 @@ class _captchaPageState extends State<CaptchaPage> {
     );
   }
   void _textFieldChanged(String str) {
-    Global.lastCaptcha = str;
+    //Global.lastCaptcha = str;
   }
 }

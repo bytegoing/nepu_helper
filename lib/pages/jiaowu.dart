@@ -27,7 +27,7 @@ class _JiaowuPageState extends State<JiaowuPage> {
 
   @override
   Widget build(BuildContext context) {
-    Global.nowContext = context;
+    //Global.nowContext = context;
     return new MaterialApp(
       //home: new LoginRoute()
         home: new Scaffold(
@@ -115,9 +115,6 @@ class _JiaowuPageState extends State<JiaowuPage> {
                               child: RaisedButton(
                                 onPressed: () {
                                   //个人信息
-                                  /*Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                    return SelfInfo();
-                                  }));*/
                                   _onClick("个人信息");
                                 },
                                 child: Text("个人信息", style: TextStyle(fontSize: 12)),
@@ -331,7 +328,7 @@ class _JiaowuPageState extends State<JiaowuPage> {
     );
   }
 
-  void _onClick(String type) {
+  Future _onClick(String type) async {
     print("clicked: " + type);
     if(!Global.ifSavedJWProfile()) {
       EasyLoading.showError("请先登录教务系统!");
@@ -339,24 +336,23 @@ class _JiaowuPageState extends State<JiaowuPage> {
     }
     switch(type) {
       case "成绩查询":
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => scoreQueryPage()));
+        await Navigator.of(context).push(MaterialPageRoute(builder: (context) => scoreQueryPage()));
         setState(() {});
-        print("OK");
         break;
       case "教学计划":
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
+        await Navigator.push(context, MaterialPageRoute(builder: (context) {
           return classPlanPage();
         }));
         setState(() {});
         break;
       case "修改密码":
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
+        await Navigator.push(context, MaterialPageRoute(builder: (context) {
           return changePasswordForm();
         }));
         setState(() {});
         break;
       case "学生选课":
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
+        await Navigator.push(context, MaterialPageRoute(builder: (context) {
           return chooseClassPage();
         }));
         setState(() {});
@@ -365,9 +361,10 @@ class _JiaowuPageState extends State<JiaowuPage> {
         EasyLoading.showInfo("暂未开放!");
         break;
     }
+    //Global.nowContext = context;
   }
 
-  void _onDWClick(String type) {
+  Future _onDWClick(String type) async {
     print("clicked DW: " + type);
     if(!Global.ifSavedDWProfile() && type != "查看通知") {
       EasyLoading.showError("请先登录大物实验系统!");

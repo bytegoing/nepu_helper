@@ -7,7 +7,7 @@ class classPlanPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Global.nowContext = context;
+    //Global.nowContext = context;
     return FutureBuilder<List<dynamic>>(
       future: Jiaowu().getClassPlan(),
       builder: (context, AsyncSnapshot<List<dynamic>> value) {

@@ -4,7 +4,7 @@ import 'package:nepu_helper/common/Global.dart';
 class Class extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Global.nowContext = context;
+    //Global.nowContext = context;
     return new MaterialApp(
       home: new Scaffold(
         appBar: new AppBar(

@@ -15,7 +15,8 @@ class Global {
   static String lastCaptcha = "";
   static Profile profile = Profile();
   static bool ifReportDio = true;
-  static BuildContext nowContext;
+  //static BuildContext nowContext;
+  static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   static bool get isRelease => bool.fromEnvironment("dart.vm.product");
 

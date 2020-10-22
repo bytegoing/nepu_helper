@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nepu_helper/pages/class.dart';
 import 'package:nepu_helper/pages/jiaowu.dart';
+import 'package:nepu_helper/common/Global.dart';
 
 class App extends StatefulWidget {
   @override
@@ -27,6 +28,7 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
+      navigatorKey: Global.navigatorKey,
       home: new Scaffold(
         body: new TabBarView(
           controller: tabController,

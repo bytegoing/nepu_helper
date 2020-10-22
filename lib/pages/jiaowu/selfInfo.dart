@@ -7,7 +7,7 @@ class SelfInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Global.nowContext = context;
+    //Global.nowContext = context;
     //获取信息
     return FutureBuilder<Map<dynamic, dynamic>>(
       future: Jiaowu().getInfo(),

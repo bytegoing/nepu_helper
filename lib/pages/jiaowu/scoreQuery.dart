@@ -17,7 +17,7 @@ class _scoreQueryPageState extends State<scoreQueryPage> {
 
   @override
   Widget build(BuildContext context) {
-    Global.nowContext = context;
+    //Global.nowContext = context;
     return new FutureBuilder<List>(
       future: Jiaowu().getScoreInfo(),
       builder: (context, value) {
@@ -28,81 +28,82 @@ class _scoreQueryPageState extends State<scoreQueryPage> {
               backgroundColor: Colors.blueAccent,
               centerTitle: true,
             ),
-            body: FlutterEasyLoading (
-                child: Padding(
-                    padding: EdgeInsets.only(left:20.0, right:20.0, bottom: 10.0),
-                    child: ListView (
-                        padding: EdgeInsets.only(bottom: 10.0),
-                        children: <Widget>[
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text("选择学期："),
-                                DropdownButton(
-                                    value: _xqDropdownValue,
-                                    items: value.data[0],
-                                    onChanged: (value) async {
-                                      _xqDropdownValue = value;
-                                      print("选中了: " + value);
-                                      EasyLoading.show(status: "正在加载成绩信息...");
-                                      xq = value;
-                                      try {
-                                        scoreList = await Jiaowu().getScore(xq, jh);
-                                      } catch(e) {
-                                        //错误
-                                        EasyLoading.showError("加载失败! " + e.toString());
-                                        return;
-                                      }
-                                      EasyLoading.dismiss();
-                                      ifQuery = true;
-                                      setState(() { });
-                                    }
-                                ),
-                              ]
-                          ),
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text("选择计划："),
-                                DropdownButton(
-                                    value: _jhDropdownValue,
-                                    items: value.data[1],
-                                    hint: Text("全部"),
-                                    onChanged: (value) async {
-                                      _jhDropdownValue = value;
-                                      print("选中了: " + value);
-                                      jh = value;
-                                      EasyLoading.show(status: "正在加载成绩信息...");
-                                      try {
-                                        scoreList = await Jiaowu().getScore(xq, jh);
-                                      } catch(e) {
-                                        //错误
-                                        EasyLoading.showError("加载失败! " + e.toString());
-                                        return;
-                                      }
-                                      EasyLoading.dismiss();
-                                      ifQuery = true;
-                                      setState(() { });
-                                    }
-                                ),
-                              ]
-                          ),
-                          scoreList.length > 1 || !ifQuery
-                              ? new Container(
-                              child: new ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: scoreList.length+1,
-                                  physics: ScrollPhysics(),
-                                  itemBuilder: (BuildContext context, int index) {
-                                    return _getScoreCard(index);
+            /*body: FlutterEasyLoading (
+                child:
+            ),*/
+            body: Padding(
+                padding: EdgeInsets.only(left:20.0, right:20.0, bottom: 10.0),
+                child: ListView (
+                    padding: EdgeInsets.only(bottom: 10.0),
+                    children: <Widget>[
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text("选择学期："),
+                            DropdownButton(
+                                value: _xqDropdownValue,
+                                items: value.data[0],
+                                onChanged: (value) async {
+                                  _xqDropdownValue = value;
+                                  print("选中了: " + value);
+                                  EasyLoading.show(status: "正在加载成绩信息...");
+                                  xq = value;
+                                  try {
+                                    scoreList = await Jiaowu().getScore(xq, jh);
+                                  } catch(e) {
+                                    //错误
+                                    EasyLoading.showError("加载失败! " + e.toString());
+                                    return;
                                   }
-                              )
+                                  EasyLoading.dismiss();
+                                  ifQuery = true;
+                                  setState(() { });
+                                }
+                            ),
+                          ]
+                      ),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text("选择计划："),
+                            DropdownButton(
+                                value: _jhDropdownValue,
+                                items: value.data[1],
+                                hint: Text("全部"),
+                                onChanged: (value) async {
+                                  _jhDropdownValue = value;
+                                  print("选中了: " + value);
+                                  jh = value;
+                                  EasyLoading.show(status: "正在加载成绩信息...");
+                                  try {
+                                    scoreList = await Jiaowu().getScore(xq, jh);
+                                  } catch(e) {
+                                    //错误
+                                    EasyLoading.showError("加载失败! " + e.toString());
+                                    return;
+                                  }
+                                  EasyLoading.dismiss();
+                                  ifQuery = true;
+                                  setState(() { });
+                                }
+                            ),
+                          ]
+                      ),
+                      scoreList.length > 1 || !ifQuery
+                          ? new Container(
+                          child: new ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: scoreList.length+1,
+                              physics: ScrollPhysics(),
+                              itemBuilder: (BuildContext context, int index) {
+                                return _getScoreCard(index);
+                              }
                           )
-                              : Container(padding: EdgeInsets.only(top: 10.0), alignment: Alignment.center, child: Text("该学期暂无成绩"),),//scoreWidget,
-                        ]
-                    )
+                      )
+                          : Container(padding: EdgeInsets.only(top: 10.0), alignment: Alignment.center, child: Text("该学期暂无成绩"),),//scoreWidget,
+                    ]
                 )
-            ),
+            )
           );
         } else {
           return new Scaffold(
@@ -161,21 +162,21 @@ class _scoreQueryPageState extends State<scoreQueryPage> {
                     new Row(
                         children: <Widget> [
                           Expanded(
-                              flex: 2,
+                              flex: 3,
                               child: Text(
-                                scoreList[index]["xdfsmc"],
+                                scoreList[index]["xnxqmc"],
                                 softWrap: true,
                                 overflow: TextOverflow.ellipsis,
                               )
                           ),
                           Expanded(
-                            flex: 1,
+                            flex: 2,
                             child: Text(
                               scoreList[index]["xf"] + "学分",
                             ),
                           ),
                           Expanded(
-                            flex: 1,
+                            flex: 2,
                             child: Text(
                               "GPA"+scoreList[index]["cjjd"],
                             ),
@@ -183,8 +184,14 @@ class _scoreQueryPageState extends State<scoreQueryPage> {
                           Expanded(
                             flex: 1,
                             child: Text(
-                                "查看详情"
+                                scoreList[index]["xdfsmc"],
                             ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text(
+                              "详情",
+                            )
                           )
                         ]
                     ),

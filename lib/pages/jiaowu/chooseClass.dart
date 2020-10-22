@@ -44,7 +44,7 @@ class _chooseClassPageState extends State<chooseClassPage> {
 
   @override
   Widget build(BuildContext context) {
-    Global.nowContext = context;
+    //Global.nowContext = context;
     return new Scaffold(
       appBar: new AppBar(
         title: new Text("学生选课"),

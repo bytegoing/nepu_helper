@@ -17,7 +17,7 @@ class _findPasswordFormState extends State<findPasswordForm> {
 
   @override
   Widget build(BuildContext context) {
-    Global.nowContext = context;
+    //Global.nowContext = context;
     return new Scaffold(
         appBar: new AppBar(
           title: new Text("找回教务系统密码"),

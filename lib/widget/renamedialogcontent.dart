@@ -98,8 +98,8 @@ class _RenameDialogContentState extends State<RenameDialogContent> {
                       FlatButton(
                           onPressed: () {
                             widget.okBtnTap();
-                            Navigator.of(context).pop();
                             widget.vc.text = "";
+                            Navigator.of(context).pop();
                           },
                           child: Text(
                             widget.okBtnTitle,

@@ -130,29 +130,28 @@ class Jiaowu {
     return imgList;
   }
 
-  Future<bool> getCaptchaTextByWidget() async {
+  Future getCaptchaTextByWidget() async {
     Global.lastCaptcha = "";
     TextEditingController _vc = new TextEditingController();
     Uint8List _img = await getCaptchaIMG();
     await showDialog(
-        barrierDismissible: false,
-        context: Global.nowContext,
-        builder: (context) {
-          return RenameDialog(
-            contentWidget: RenameDialogContent(
-              title: "请输入验证码",
-              okBtnTap: () {
-                Global.lastCaptcha = _vc.text;
-              },
-              vc: _vc,
-              cancelBtnTap: () {},
-              img: _img,
-            ),
-          );
-        });
+      barrierDismissible: false,
+      context: Global.navigatorKey.currentState.overlay.context,
+      builder: (context) {
+        return RenameDialog(
+          contentWidget: RenameDialogContent(
+            title: "请输入验证码",
+            okBtnTap: () {
+              Global.lastCaptcha = _vc.text;
+            },
+            vc: _vc,
+            cancelBtnTap: () {},
+            img: _img,
+          ),
+        );
+      }
+    );
     print("验证码:"+Global.lastCaptcha);
-    if(Global.lastCaptcha.length <= 0) return false;
-    else return true;
   }
 
   /*Future<String> getCaptchaText(Uint8List uInt8ListImg) async {
@@ -206,7 +205,8 @@ class Jiaowu {
     int codeErrorCount = 0;
     while(codeErrorCount < 5) {
       //String captcha = await JiaowuCaptcha().GetText(await getCaptchaIMG());
-      if(!await getCaptchaTextByWidget()) {
+      await getCaptchaTextByWidget();
+      if(Global.lastCaptcha.length <= 0) {
         throw new Exception("请输入验证码!");
       }
       String captcha = Global.lastCaptcha;
@@ -329,7 +329,6 @@ class Jiaowu {
 
   Future<List> getScore(String xq, String jh) async {
     print("获取成绩");
-    List score = [];
     var dio = await getDio();
     Map<String, dynamic> formData = {
       "xnxqdm": xq,
