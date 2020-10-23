@@ -131,6 +131,8 @@ class Jiaowu {
   }
 
   Future getCaptchaTextByWidget() async {
+    String tipText = "请输入验证码";
+    if(Global.lastCaptcha.length > 0) tipText = "验证码错误,请重新输入";
     Global.lastCaptcha = "";
     TextEditingController _vc = new TextEditingController();
     Uint8List _img = await getCaptchaIMG();
@@ -140,7 +142,7 @@ class Jiaowu {
       builder: (context) {
         return RenameDialog(
           contentWidget: RenameDialogContent(
-            title: "请输入验证码",
+            title: tipText,
             okBtnTap: () {
               Global.lastCaptcha = _vc.text;
             },
@@ -247,13 +249,10 @@ class Jiaowu {
         return;
       } else {
         //NOT OK
-        /*if (rtn["data"].contains("密码不正确")) {
-          Global.removeJWProfile();
-          throw new Exception("用户名或密码错误");
-        } else */
-        if (rtn["data"].contains("验证码")) {
+        if (rtn["message"].contains("验证码")) {
           //再试一次
           print("验证码错误");
+          //throw new Exception("");
           codeErrorCount++;
           continue;
         } else {

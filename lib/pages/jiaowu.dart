@@ -27,30 +27,26 @@ class _JiaowuPageState extends State<JiaowuPage> {
 
   @override
   Widget build(BuildContext context) {
-    //Global.nowContext = context;
     return new MaterialApp(
-      //home: new LoginRoute()
         home: new Scaffold(
             appBar: new AppBar(
               title: new Text("教务相关"),
               backgroundColor: Colors.blueAccent,
               centerTitle: true,
             ),
-            body: FlutterEasyLoading (
-              child: new ListView (
-                  padding: const EdgeInsets.all(15.0),
-                  children: <Widget> [
-                    _buildProfile(context),
-                    new SizedBox(height: 20),
-                    _buildFunction(context),
-                    new SizedBox(height: 10),
-                    _buildDWProfile(context),
-                    new SizedBox(height: 20),
-                    _buildDWFunction(context),
-                  ]
-              ),
-            )
-        )
+            body: new ListView (
+                padding: const EdgeInsets.all(15.0),
+                children: <Widget> [
+                  _buildProfile(context),
+                  new SizedBox(height: 20),
+                  _buildFunction(context),
+                  new SizedBox(height: 10),
+                  _buildDWProfile(context),
+                  new SizedBox(height: 20),
+                  _buildDWFunction(context),
+                ]
+            ),
+        ),
     );
   }
 

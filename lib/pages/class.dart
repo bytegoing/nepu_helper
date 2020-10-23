@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:nepu_helper/common/Global.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class Class extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //Global.nowContext = context;
+    //List<String> datas = getDataList();
     return new MaterialApp(
       home: new Scaffold(
         appBar: new AppBar(
@@ -12,8 +14,8 @@ class Class extends StatelessWidget {
           backgroundColor: Colors.blueAccent,
           centerTitle: true,
         ),
-        body: new Center(
-          child: new Text("课表正文,暂未开放,点击下方“教务”试试看吧！"),
+        body: new StaggeredGridView.countBuilder(
+          crossAxisCount: 8,
         )
       )
     );

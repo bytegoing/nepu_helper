@@ -17,20 +17,17 @@ class _scoreQueryPageState extends State<scoreQueryPage> {
 
   @override
   Widget build(BuildContext context) {
-    //Global.nowContext = context;
     return new FutureBuilder<List>(
       future: Jiaowu().getScoreInfo(),
       builder: (context, value) {
         if(value.data != null) {
+          EasyLoading.dismiss();
           return new Scaffold(
             appBar: new AppBar(
               title: new Text("成绩查询"),
               backgroundColor: Colors.blueAccent,
               centerTitle: true,
             ),
-            /*body: FlutterEasyLoading (
-                child:
-            ),*/
             body: Padding(
                 padding: EdgeInsets.only(left:20.0, right:20.0, bottom: 10.0),
                 child: ListView (
@@ -103,9 +100,10 @@ class _scoreQueryPageState extends State<scoreQueryPage> {
                           : Container(padding: EdgeInsets.only(top: 10.0), alignment: Alignment.center, child: Text("该学期暂无成绩"),),//scoreWidget,
                     ]
                 )
-            )
+            ),
           );
         } else {
+          EasyLoading.show(status: "正在加载...");
           return new Scaffold(
               appBar: new AppBar(
                 title: new Text("成绩信息"),

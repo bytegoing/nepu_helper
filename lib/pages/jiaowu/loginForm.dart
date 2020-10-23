@@ -64,33 +64,33 @@ class _LoginFormState extends State<LoginForm> {
                         onPressed: () async {
                           FocusScope.of(context).requestFocus(FocusNode());
                           if((_formKey.currentState as FormState).validate()) {
-                            //EasyLoading.show(status: "正在登录...");
-                            Fluttertoast.showToast(
+                            EasyLoading.show(status: "正在登录...");
+                            /*Fluttertoast.showToast(
                               msg: "正在登录...",
                               gravity: ToastGravity.TOP,
                               backgroundColor: Colors.grey,
                               fontSize: 16,
-                            );
+                            );*/
                             try {
                               await Jiaowu().login(_xhController.text, _passController.text);
                             } catch(e) {
                               print(e.toString());
-                              //EasyLoading.showError("登陆失败:"+e.toString());
-                              Fluttertoast.showToast(
+                              EasyLoading.showError("登陆失败:"+e.toString());
+                              /*Fluttertoast.showToast(
                                 msg: "登录失败: " + e.toString(),
                                 gravity: ToastGravity.TOP,
                                 backgroundColor: Colors.grey,
                                 fontSize: 16,
-                              );
+                              );*/
                               return;
                             }
-                            Fluttertoast.showToast(
+                            /*Fluttertoast.showToast(
                               msg: "登录成功",
                               gravity: ToastGravity.TOP,
                               backgroundColor: Colors.grey,
                               fontSize: 16,
-                            );
-                            //EasyLoading.showSuccess("登录成功");
+                            );*/
+                            EasyLoading.showSuccess("登录成功");
                             Navigator.pop(context);
                           }
                         },

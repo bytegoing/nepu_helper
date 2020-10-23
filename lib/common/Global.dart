@@ -1,6 +1,7 @@
 //管理全局变量
 import 'dart:convert';
 
+import 'package:nepu_helper/models/classProfile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nepu_helper/models/profile.dart';
 
@@ -14,6 +15,7 @@ class Global {
   static String lastCookie = "";
   static String lastCaptcha = "";
   static Profile profile = Profile();
+  static ClassProfile classProfile = ClassProfile();
   static bool ifReportDio = true;
   //static BuildContext nowContext;
   static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -27,10 +29,17 @@ class Global {
     if(_profileStr != null && _profileStr.isNotEmpty) {
       print("Got Profile: " + _profileStr);
     }
+    var _classProfileStr = _prefs.getString("classProfile");
+    if(_classProfileStr != null && _classProfileStr.isNotEmpty) {
+      print("Got Class Profile: " + _classProfileStr);
+    }
     Map<String, dynamic> _profileJson;
+    Map<String, dynamic> _classProfileJson;
     try {
       _profileJson = jsonDecode(_profileStr);
+      _classProfileJson = jsonDecode(_classProfileStr);
       profile = Profile.fromJson(_profileJson);
+      classProfile = ClassProfile.fromJson(_classProfileJson);
     } catch(e) {
       print("Profile JSON Error! " + e.toString());
       removeJWProfile();
@@ -42,6 +51,12 @@ class Global {
     _prefs = await SharedPreferences.getInstance();
     print("Saving Profile: " + jsonEncode(profile.toJson()));
     _prefs.setString("Profile", jsonEncode(profile.toJson()));
+  }
+
+  static void saveClassProfile() async {
+    _prefs = await SharedPreferences.getInstance();
+    print("Saving Class Profile: " + jsonEncode(classProfile.toJson()));
+    _prefs.setString("Profile", jsonEncode(classProfile.toJson()));
   }
 
   static void removeJWProfile() async {
