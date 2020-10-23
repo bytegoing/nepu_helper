@@ -35,7 +35,7 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
             controller: tabController,
             //底部栏元素所对应的方法
             children: <Widget>[
-              new Class(),
+              new ClassPage(),
               new JiaowuPage(),
             ],
           ),

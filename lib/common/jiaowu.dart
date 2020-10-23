@@ -296,6 +296,61 @@ class Jiaowu {
     return info;
   }
 
+  Future<Map> getKcXnxq() async {
+    print("获取课表学期...");
+    Map<String, String> info = new Map<String, String>();
+    //List<Widget> rtn = new List<Widget>();
+    var dio = await getDio();
+    String pageStr;
+    try {
+      pageStr = (await dio.get("/xskccjxx!xskccj.action")).toString();
+    } catch(e) {
+      if(Global.ifReportDio) {
+        throw e;
+      } else {
+        throw new Exception("网络错误!请稍后重试...");
+      }
+    }
+    var pageStrXPath = XPath.source(pageStr);
+    var xnxqNameList = pageStrXPath.query("//select[@id='xnxqdm']/option/text()").list();
+    var xnxqValueList = pageStrXPath.query("//select[@id='xnxqdm']/option/@value").list();
+    for(int i = 0;i < xnxqNameList.length;i++) {
+      //print(xnxqNameList[i] + ":" + xnxqValueList[i]); //+ ":" + xnxqValueList[i].substring(0,4));
+      if(xnxqNameList[i] == "全部") continue;
+      //print(xnxqValueList[i].substring(0,4));
+      //if(int.parse(xnxqValueList[i].substring(0,4)) > DateTime.now().year + 1) continue;
+      //rtn.add(FlatButton(child: new Text(xnxqNameList[i]), onPressed: () => _getKcInfo(xnxqValueList[i]),));
+      //xnxqList.add(DropdownMenuItem(child: Text(xnxqNameList[i]), value: xnxqValueList[i]));
+      info[xnxqNameList[i]] = xnxqValueList[i];
+    }
+    return info;
+  }
+
+  Future<List> getKcInfo(String xnxqdm) async {
+    print("获取课程, 学期$xnxqdm");
+    Map classes;
+    var dio = await getDio();
+    String pageStr;
+    try {
+      pageStr = (await dio.get("/xsgrkbcx!xsAllKbList.action?xnxqdm=$xnxqdm")).toString();
+    } catch(e) {
+      if(Global.ifReportDio) {
+        throw e;
+      } else {
+        throw new Exception("网络错误!请稍后重试...");
+      }
+    }
+    if(pageStr.contains("还未开放")) {
+      print("未开放");
+      throw new Exception("本学期课表还未开放,请稍后查询!");
+    }
+    //print("页面:$pageStr");
+    RegExp reg = new RegExp(r"\[\{.*\}\]");
+    var kcxx = reg.firstMatch(pageStr).group(0);
+    //print("获取到:$kcxx");
+    return jsonDecode(kcxx);
+  }
+
   Future<List> getScoreInfo() async {
     print("获取成绩学期和计划类型...");
     List<DropdownMenuItem<dynamic>> scoreXQ = [];
